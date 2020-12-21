@@ -1,0 +1,17 @@
+<#Jnkings PS script - I write this script to delete files from a unc path every day - (Schedule in jenkins ) #>
+
+
+$uncServer = "\\UNCPath"
+$uncFullPath = "$uncServer\QueryExport"
+$username = "user"
+$password = "password"
+
+net use $uncServer $password /USER:$username
+try  
+{
+Get-ChildItem $uncFullPath -File -Recurse| Remove-Item -Verbose
+}
+finally {  
+net use $uncServer /delete  
+}
+
