@@ -1,0 +1,12 @@
+#on October 2023 - this script can only run with AzureADPreview module -  "Install-module AzureADPreview"
+connect-azuread
+
+#Create a dynamic group that contains members of all groups start with ABC"
+$str = "'"
+foreach ($ObjectId in (Get-AzureADGroup -Filter "startswith(DisplayName, 'ABC')").ObjectId)
+{
+    $str += $ObjectId
+    $str += "','"
+}
+
+New-AzureADMSGroup -DisplayName "DynamicGroup01" -Description "Dynamic group created from PS" -MailEnabled $False -MailNickName "group" -SecurityEnabled $True -GroupTypes "DynamicMembership" -MembershipRule "user.memberOf -any (group.objectId -in [$($str.Substring(0, $str.Length - 2))])" -MembershipRuleProcessingState "On"
